@@ -1,2 +1,2 @@
 # Jimmy-MK-IV
-jimmy is a big boi now
+if you steal this code i will steal your kneecaps
