@@ -9,8 +9,8 @@ __email__ = "hudsonliu0@gmail.com"
 import matplotlib.pyplot as plt
 from math import sin, cos, pi
 
-def plot_model(num_nodes):
-    """Creates plot of the model"""
+def plot_circular_model(num_nodes):
+    """Creates plot of circular  model"""
     # Create list of angles for all nodes
     angles = [(2 * pi * x) / num_nodes for x in range(num_nodes)]
 
@@ -32,6 +32,26 @@ def plot_model(num_nodes):
     plt.title("Jimmy MK IV")
     plt.show()
 
+def plot_linear(nodes):
+    """Part of the Node-To-Weight reference table creation"""
+    b = []
+    for x in range(nodes):
+        a = []
+        prev_adder = 0
+        a.append(x)
+        for y in range(1, nodes):#important part, replace a with node_inds
+            if x >= y:
+                adder = prev_adder + abs(y - nodes) - 1
+                a.append(x + adder) #end of important part
+                prev_adder = adder
+        b.append(a) #change this to extend
+    for e in b:
+        plt.plot(e, color="red")
+    plt.show()
+#def plot_grid2d_model(input_nodes, output_nodes, side_length):
+ #   pass
+
 
 if __name__ == "__main__":
-    plot_model(30)
+    plot_circular_model(20)
+    plot_linear(20)
