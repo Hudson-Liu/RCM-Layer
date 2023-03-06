@@ -36,12 +36,12 @@ class JimmyMarkIV(tf.keras.layers.Layer):
     def build(self, input_shape):
         """Creates weights, biases, and untracked node states"""
         # Saves input shape and total units for call usage
-        self.input_shape = input_shape[-1]
-        self.total_units = self.hidden_units + self.output_units + self.input_shape
+        self.input_nodes = input_shape[-1]
+        self.total_units = self.hidden_units + self.output_units + self.input_nodes
         
         # Weights and biases
         self.w = self.add_weight(
-            shape=(input_shape[-1], self.total_units),
+            shape=((self.total_units * (self.total_units - 1)) // 2,),
             initializer=self.weight_initializer,
             trainable=True
         )
@@ -52,6 +52,12 @@ class JimmyMarkIV(tf.keras.layers.Layer):
         )
         
         # Node states
+        if input_shape[0] == None: # TODO get rid of this
+            raise ValueError("TENATIVE MESSAGE BEFORE DYNAMIC ARRAY FIX, CANT USE VARIABLE BATCH SIZE")
+        self.batch_states = tf.Variable( # TODO use "tf.TensorArray(dtype=tf.float32, size=0, dynamic_size=True)" tensor array instead of hardcoded tf variable
+            initial_value=[[0.] * self.total_units for _ in range(input_shape[0])], #TODO make this work on arbitrarily determine batch sizes https://stackoverflow.com/questions/56101920/get-batch-size-in-keras-custom-layer-and-use-tensorflow-operations-tf-variable
+            trainable=False
+        ) # TODO merge states and batch_states
         self.states = tf.Variable(
             initial_value=[0.] * self.total_units,
             trainable=False
@@ -99,7 +105,7 @@ class JimmyMarkIV(tf.keras.layers.Layer):
             merged.append(merge_row)
 
         # Return final weight table
-        return np.array(merged)
+        return np.array(merged, dtype=int)
 
     @overrides
     @tf.function
@@ -109,30 +115,31 @@ class JimmyMarkIV(tf.keras.layers.Layer):
         Using the @tf.function decorator allows it to be
         ran as a graph, greatly accelerating training speed.
         """
-        # Update inputs
-        self.states[:self.input_shape].assign(inputs)
-        
-        # Begin propagation
-        for _ in range(self.num_propagations):
-            # Update each node's state
-            for node in range(self.total_units):
-                # Calculate the corresponding weight indexes using the weight table
-                weight_inds = self.weight_table[node]
+        # Iterate through each batch of inputs
+        for batch in tqdm(tf.range(tf.shape(inputs)[0])):
+            # Begin propagation
+            self.states[:self.input_nodes].assign(inputs[batch])
+            for _ in range(self.num_propagations):
+                # Update each node's state
+                for node in range(self.total_units):
+                    # Calculate the corresponding weight indexes using the weight table
+                    weight_inds = self.weight_table[node]
+                    node_weights = tf.gather(self.w, indices=weight_inds)
+
+                    # Get the neighboring nodes by getting all nodes minus the current one
+                    neighbor_nodes = tf.concat([self.states[:node], self.states[(node + 1):]], 0)
+
+                    # Calculate new state of node
+                    new_state = tf.tensordot(node_weights, neighbor_nodes, axes=1) + self.b[node] # TODO Accelerate this
+                    if self.activation != None: # TODO get activations to work
+                        new_state = self.activation(new_state)
+                    self.new_states[node].assign(new_state)
                 
-                # Get the neighboring nodes by getting all nodes minus the current one
-                neighbor_nodes = tf.concat(self.states[:node], self.states[(node + 1):])
-
-                # Calculate new state of node
-                new_state = tf.tensordot(self.w[weight_inds], neighbor_nodes) + self.b[node] # TODO Accelerate this, also make sure that all of the neighboring nodes are in the same pattern as the weights are in
-                if self.activation != None:
-                    new_state = self.activation(new_state)
-                self.new_states[node]
-            
-            # Update all states
-            self.states.assign(self.new_states)
-
+                # Update all states
+                self.states.assign(self.new_states)
+            self.batch_states[batch].assign(self.states)
         # Returns output 
-        return self.states[-self.output_units:]
+        return self.batch_states[:, -self.output_units:]
 
     @overrides
     def get_config(self):

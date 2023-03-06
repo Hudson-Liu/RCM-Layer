@@ -12,8 +12,10 @@ from keras.layers import (
     Conv2D,
     MaxPooling2D,
     Flatten,
-    Dropout
+    Dropout,
+    Dense
 )
+import tensorflow as tf
 
 from jimmy_mk_iv import JimmyMarkIV
 
@@ -37,22 +39,33 @@ y_train = keras.utils.to_categorical(y_train, num_classes)
 y_test = keras.utils.to_categorical(y_test, num_classes)
 
 # Design model
-inputs = keras.Input(shape=input_shape)
+inputs = keras.Input(shape=input_shape, batch_size=128)
 conv = Conv2D(32, kernel_size=(3, 3), activation="relu")(inputs)
 pool = MaxPooling2D(pool_size=(2, 2))(conv)
 conv = Conv2D(64, kernel_size=(3, 3), activation="relu")(pool)
 pool = MaxPooling2D(pool_size=(2, 2))(conv)
 flatten = Flatten()(pool)
 dropout = Dropout(0.5)(flatten)
-outputs = JimmyMarkIV(hidden_units=50, output_units=num_classes, num_propagations=10)(dropout)
+dense = Dense(20)(dropout)
+jimmy = JimmyMarkIV(hidden_units=10, output_units=10, num_propagations=5)(dense) # TODO Activation currently doesn't work
+outputs = Dense(num_classes, activation="softmax")(jimmy)
 
 # Create model
 model = keras.Model(inputs=inputs, outputs=outputs, name="Jimmy_MK_IV_Test")
+keras.utils.plot_model(model, to_file="jimmy.png", show_shapes=True)
+
 model.compile(
     loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
     optimizer=keras.optimizers.RMSprop(),
     metrics=["accuracy"],
 )
 
-history = model.fit(x_train, y_train, batch_size=64, epochs=2, validation_split=0.2)
-test_scores = model.evaluate(x_test, y_test, verbose=2)
+batch_size = 128
+epochs = 15
+model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
+model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1)
+score = model.evaluate(x_test, y_test, verbose=0)
+print("Test loss:", score[0])
+print("Test accuracy:", score[1])
+
+# Add TensorBoard
