@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""visualizer.py: Contains methods for creating a visualization"""
+"""visualizations.py: Contains methods for creating a visualization"""
 
 __author__ = "Hudson Liu"
 __email__ = "hudsonliu0@gmail.com"
@@ -9,8 +9,9 @@ __email__ = "hudsonliu0@gmail.com"
 import matplotlib.pyplot as plt
 from math import sin, cos, pi
 
-def plot_circular_model(num_nodes):
-    """Creates plot of circular  model"""
+def plot_rcm_layer(num_nodes):
+    """Creates plot of Recurrent Complete Multidigraph model"""
+    # TODO make this support multidigraphs
     # Create list of angles for all nodes
     angles = [(2 * pi * x) / num_nodes for x in range(num_nodes)]
 
@@ -32,25 +33,4 @@ def plot_circular_model(num_nodes):
     plt.title("Jimmy MK IV")
     plt.show()
 
-def plot_linear(nodes):
-    """Part of the Node-To-Weight reference table creation"""
-    b = []
-    for row in range(nodes):
-        a = []
-        prev_adder = 0
-        if row > 0:
-            a.append(row - 1)
-        for col in range(1, nodes):#important part, replace a with node_inds
-            if row - 1 >= col:
-                adder = prev_adder + abs(col - nodes) - 1
-                a.append(row - 1 + adder) #end of important part
-                prev_adder = adder
-        b.append(a) #change this to extend
-    print(b)
-#def plot_grid2d_model(input_nodes, output_nodes, side_length):
- #   pass
-
-
-if __name__ == "__main__":
-    plot_circular_model(5)
-    #plot_linear(5)
+# TODO add "plot_rcm_3d"

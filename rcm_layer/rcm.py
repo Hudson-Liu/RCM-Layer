@@ -11,6 +11,7 @@ import numpy as np
 from overrides import overrides
 
 
+# TODO rewrite this to support the new Recurrent Complete Multidigraph
 class JimmyMarkIV(tf.keras.layers.Layer):
     """The Jimmy Auto-Recurrent Network Layer"""
     
@@ -116,7 +117,7 @@ class JimmyMarkIV(tf.keras.layers.Layer):
         ran as a graph, greatly accelerating training speed.
         """
         # Iterate through each batch of inputs
-        for batch in tqdm(tf.range(tf.shape(inputs)[0])):
+        for batch in tf.range(tf.shape(inputs)[0]):
             # Begin propagation
             self.states[:self.input_nodes].assign(inputs[batch])
             for _ in range(self.num_propagations):

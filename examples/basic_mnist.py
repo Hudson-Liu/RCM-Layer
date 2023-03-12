@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""trainer.py: Trains a model using the MNIST dataset"""
+"""basic_mnist.py: Trains a model using the MNIST dataset"""
 
 __author__ = "Hudson Liu"
 __email__ = "hudsonliu0@gmail.com"
@@ -15,9 +15,12 @@ from keras.layers import (
     Dropout,
     Dense
 )
+import datetime
 import tensorflow as tf
 
-from jimmy_mk_iv import JimmyMarkIV
+from rcm_layer import JimmyMarkIV
+
+# TODO Clean this program up
 
 # Model parameters
 num_classes = 10
@@ -39,7 +42,7 @@ y_train = keras.utils.to_categorical(y_train, num_classes)
 y_test = keras.utils.to_categorical(y_test, num_classes)
 
 # Design model
-inputs = keras.Input(shape=input_shape, batch_size=128)
+inputs = keras.Input(shape=input_shape)
 conv = Conv2D(32, kernel_size=(3, 3), activation="relu")(inputs)
 pool = MaxPooling2D(pool_size=(2, 2))(conv)
 conv = Conv2D(64, kernel_size=(3, 3), activation="relu")(pool)
@@ -62,8 +65,12 @@ model.compile(
 
 batch_size = 128
 epochs = 15
+
+log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
 model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
-model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1)
+model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1, callbacks=[tensorboard_callback])
 score = model.evaluate(x_test, y_test, verbose=0)
 print("Test loss:", score[0])
 print("Test accuracy:", score[1])
