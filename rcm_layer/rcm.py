@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""jimmy_mk_iv.py: Contains the tools for creating an Auto-Recurrent Network"""
+"""rcm.py: Contains a Keras layer implementation of the Recurrent Complete Multidigraph Layer"""
 
 __author__ = "Hudson Liu"
 __email__ = "hudsonliu0@gmail.com"
@@ -11,9 +11,8 @@ import numpy as np
 from overrides import overrides
 
 
-# TODO rewrite this to support the new Recurrent Complete Multidigraph
-class JimmyMarkIV(tf.keras.layers.Layer):
-    """The Jimmy Auto-Recurrent Network Layer"""
+class RCM(tf.keras.layers.Layer):
+    """A Keras implementation of the Recurrent Complete Multidigraph Layer"""
     
     @overrides
     def __init__(self, 
