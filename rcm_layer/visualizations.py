@@ -21,7 +21,7 @@ def plot_rcm_layer(num_nodes: int):
 
     # Generate points and create lines
     for i in range(num_nodes):
-        for j in range(i, num_nodes):
+        for j in range(num_nodes):
             color = COLORS[0]
             for line_num in range(NUM_DOUBLE_LINES):
                 # Augment the angles by a certain offset denoted in radians
