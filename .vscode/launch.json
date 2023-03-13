@@ -1,0 +1,36 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Basic MNIST",
+            "type": "python",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "module": "examples.basic_mnist",
+        },
+        {
+            "name": "Run Basic CIFAR",
+            "type": "python",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "module": "examples.basic_cifar",
+        },
+        {
+            "name": "Run Basic FFNN",
+            "type": "python",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "module": "examples.basic_ffnn",
+        },
+        {
+            "name": "Run Basic Visualizations",
+            "type": "python",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "module": "examples.basic_visualizations",
+        }
+    ]
+}

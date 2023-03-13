@@ -6,5 +6,5 @@
 __author__ = "Hudson Liu"
 __email__ = "hudsonliu0@gmail.com"
 
-from rcm import *
-from visualizations import *
+from rcm_layer.rcm import *
+from rcm_layer.visualizations import *

@@ -18,7 +18,7 @@ from keras.layers import (
 import datetime
 import tensorflow as tf
 
-from rcm_layer import JimmyMarkIV
+from rcm_layer import RCM
 
 # TODO Clean this program up
 
@@ -50,7 +50,7 @@ pool = MaxPooling2D(pool_size=(2, 2))(conv)
 flatten = Flatten()(pool)
 dropout = Dropout(0.5)(flatten)
 dense = Dense(20)(dropout)
-jimmy = JimmyMarkIV(hidden_units=10, output_units=10, num_propagations=5)(dense) # TODO Activation currently doesn't work
+jimmy = RCM(hidden_units=10, output_units=10, num_propagations=5)(dense) # TODO Activation currently doesn't work
 outputs = Dense(num_classes, activation="softmax")(jimmy)
 
 # Create model
