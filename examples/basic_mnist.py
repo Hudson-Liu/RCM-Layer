@@ -49,9 +49,8 @@ conv = Conv2D(64, kernel_size=(3, 3), activation="relu")(pool)
 pool = MaxPooling2D(pool_size=(2, 2))(conv)
 flatten = Flatten()(pool)
 dropout = Dropout(0.5)(flatten)
-dense = Dense(20)(dropout)
-jimmy = RCM(hidden_units=10, output_units=10, num_propagations=5)(dense) # TODO Activation currently doesn't work
-outputs = Dense(num_classes, activation="softmax")(jimmy)
+rcm = RCM(hidden_units=5, output_units=10, num_propagations=5, activation="relu")(dropout)
+outputs = Dense(10, activation="softmax")(rcm)
 
 # Create model
 model = keras.Model(inputs=inputs, outputs=outputs, name="Jimmy_MK_IV_Test")
