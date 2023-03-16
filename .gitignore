@@ -1,6 +1,8 @@
+# Other custom files
+logs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
-logs/
 *.py[cod]
 *$py.class
 
