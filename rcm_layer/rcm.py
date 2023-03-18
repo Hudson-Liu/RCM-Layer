@@ -55,8 +55,10 @@ class RCM(tf.keras.layers.Layer):
         
         # Initialize normalization position and verify validity
         if (normalization_position != "preactivation") and (normalization_position != "postactivation") and (normalization_position != None):
-            raise ValueError("The normalization_position value you entered was invalid." + 
-                             f"The value must either be 'preactivation' or 'postactivation', received {normalization_position}")
+            raise ValueError(
+                "The normalization_position value you entered was invalid." + 
+                f"The value must either be 'preactivation' or 'postactivation', received {normalization_position}"
+            )
         self.batch_norm = tf.keras.layers.BatchNormalization()
         self.normalization_position = normalization_position
 
@@ -144,7 +146,11 @@ class RCM(tf.keras.layers.Layer):
                 "hidden_units": self.hidden_units,
                 "output_units": self.output_units,
                 "num_propagations": self.num_propagations,
-                "weight_initializer": self.weight_initializer
+                "activations": self.activations,
+                "weight_initializer": self.weight_initializer,
+                "normalization_position": self.normalization_position,
+                "dropout_rate": self.dropout_rate,
+                "name": self.name
             }
         )
         return config
