@@ -16,25 +16,28 @@ class ShapeTest(unittest.TestCase):
 
     def test_output_shape(self):
         """Checks if outputs are the expected shape"""
-        rcm_instance = self.__get_rcm(5, 2)(Input(shape=(9,)))
-        correct = [None, 2]
-        actual = rcm_instance.shape.as_list()
+        INPUTS, HIDDEN, OUTPUTS = 9, 5, 2
+        rcm = self.__get_rcm(HIDDEN, OUTPUTS)(Input(shape=(INPUTS,)))
+        correct = [None, OUTPUTS]
+        actual = rcm.shape.as_list()
         self.assertEqual(correct, actual)
 
     def test_internal_weight_shape(self):
         """Checks if internal weight tensors are the expected shape"""
-        rcm_instance = self.__get_rcm(5, 2)
-        rcm_instance.build(input_shape=(9,))
-        correct = [9 + 5 + 2, 9 + 5 + 2]
-        actual = rcm_instance.w.shape.as_list()
+        INPUTS, HIDDEN, OUTPUTS = 9, 5, 2
+        rcm = self.__get_rcm(HIDDEN, OUTPUTS)
+        rcm.build(input_shape=(INPUTS,))
+        correct = [INPUTS + HIDDEN + OUTPUTS, INPUTS + HIDDEN + OUTPUTS]
+        actual = rcm.w.shape.as_list()
         self.assertEqual(correct, actual)
     
     def test_internal_bias_shape(self):
         """Checks if internal bias tensors are the expected shape"""
-        rcm_instance = self.__get_rcm(5, 2)
-        rcm_instance.build(input_shape=(9,))
-        correct = [9 + 5 + 2]
-        actual = rcm_instance.b.shape.as_list()
+        INPUTS, HIDDEN, OUTPUTS = 9, 5, 2
+        rcm = self.__get_rcm(HIDDEN, OUTPUTS)
+        rcm.build(input_shape=(INPUTS,))
+        correct = [INPUTS + HIDDEN + OUTPUTS]
+        actual = rcm.b.shape.as_list()
         self.assertEqual(correct, actual)
     
     def __get_rcm(self, hidden, outputs):

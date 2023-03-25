@@ -17,7 +17,8 @@ from keras.layers import (
     MaxPooling2D,
     Flatten,
     Dropout,
-    Dense
+    Dense,
+    BatchNormalization
 )
 import tensorflow as tf
 
@@ -27,15 +28,14 @@ from rcm_layer import RCM, ActivationTable
 # Defines Model Hyperparameters
 NUM_CLASSES = 100
 INPUT_SHAPE = (32, 32, 3)
-ACTIVATION_TABLE: ActivationTable = { # NOTE: The "ActivationTable" type annotation is not required, but recommended
-    "inputs": "relu", 
-    "hidden": "relu", 
-    "outputs": "softmax"
-}
 BATCH_SIZE = 128
-EPOCHS = 100
-HIDDEN_UNITS = 0
-NUM_PROPAGATIONS = 2
+EPOCHS = 600
+HIDDEN_UNITS = 100
+RCM_OUTPUTS = 100
+NUM_PROPAGATIONS = 5
+NORMALIZATION = None
+OPTIMIZER = "adam"
+DENSE_NORM = True # Whether normalization should be applied to the standard dense layer
 
 # Load MNIST dataset
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar100.load_data()
@@ -48,9 +48,9 @@ x_test = np.expand_dims(x_test, -1)
 y_train = tf.keras.utils.to_categorical(y_train, NUM_CLASSES)
 y_test = tf.keras.utils.to_categorical(y_test, NUM_CLASSES)
 
-def equivalent_dense_nodes(input_nodes: int, hidden_units: int, output_nodes: int) -> int:
+def equivalent_dense_nodes(input_nodes: int, hidden_units: int, rcm_outputs: int, final_outputs: int) -> int:
     """Calculates the necessary number of hidden Dense nodes needed to equal the same number of parameters as the RCM layer"""
-    return (input_nodes + hidden_units + output_nodes) ** 2 // (input_nodes + output_nodes)
+    return ((input_nodes + hidden_units + rcm_outputs) ** 2  + (rcm_outputs * final_outputs)) // (input_nodes + final_outputs)
 
 def create_model(model_type: str) -> tf.keras.Model:
     """Creates a model with either an RCM or Dense layer"""
@@ -67,22 +67,28 @@ def create_model(model_type: str) -> tf.keras.Model:
 
     # Creates either a Dense layer or an RCM layer
     if model_type == "rcm":
-        outputs = RCM(
+        layer = RCM(
             hidden_units=HIDDEN_UNITS, 
             output_units=NUM_CLASSES,
             num_propagations=NUM_PROPAGATIONS, 
-            activations=ACTIVATION_TABLE,
+            activations="relu",
+            normalization_position=NORMALIZATION
         )(dropout)
+        norm = BatchNormalization()(layer)
     elif model_type == "dense":
         nodes = equivalent_dense_nodes(
             dropout.get_shape()[-1], 
             HIDDEN_UNITS, 
             NUM_CLASSES
         )
-        hidden_layer = Dense(nodes, activation="relu")(dropout)
-        outputs = Dense(NUM_CLASSES, activation="softmax")(hidden_layer)
+        norm = BatchNormalization()(dropout)
+        layer = Dense(nodes, activation="relu")(norm if DENSE_NORM else dropout)
+        norm = BatchNormalization()(layer)
     else:
         raise ValueError(f"'model_type' must either be 'rcm' or 'dense', got {model_type}.")
+    
+    # Adds a final output layer
+    outputs = Dense(NUM_CLASSES, activation="softmax")(norm if DENSE_NORM else layer)
     
     # Returns final model
     return tf.keras.Model(inputs, outputs)
@@ -94,15 +100,19 @@ for model_type in MODEL_TYPES:
     model = create_model(model_type)
     model.compile(
         loss=tf.keras.losses.CategoricalCrossentropy(),
-        optimizer=tf.keras.optimizers.RMSprop(),
+        optimizer=OPTIMIZER,
         metrics=["accuracy"],
     )
 
+    # Create filename
+    dense_norm_str = "DenseNorm" if DENSE_NORM else "NoDenseNorm"
+    filename = f"CIFAR_{EPOCHS}_{HIDDEN_UNITS}_{model_type}_{OPTIMIZER}_{dense_norm_str}"
+    log_dir = f"models/logs/fit/{filename}"
+
     # Creates visualizations and logs
     tf.keras.utils.plot_model(model, to_file=f"models/CIFAR_{model_type}.png", show_shapes=True)
-    log_dir = f"models/logs/fit/CIFAR_{EPOCHS}_{HIDDEN_UNITS}_{model_type}"
     if model_type == "rcm":
-        log_dir += f"_{NUM_PROPAGATIONS}"
+        log_dir += f"_{NUM_PROPAGATIONS}_{NORMALIZATION}"
     if os.path.exists(log_dir) and os.path.isdir(log_dir):
         shutil.rmtree(log_dir)
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
@@ -114,3 +124,6 @@ for model_type in MODEL_TYPES:
     score = model.evaluate(x_test, y_test, verbose=0)
     print(f"{model_type} test loss:", score[0])
     print(f"{model_type} test accuracy:", score[1])
+
+    # Save model in SavedModel format
+    model.save(f"models/{filename}")

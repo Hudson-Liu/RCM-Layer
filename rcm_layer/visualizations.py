@@ -7,6 +7,8 @@ __author__ = "Hudson Liu"
 __email__ = "hudsonliu0@gmail.com"
 
 import matplotlib.pyplot as plt
+import numpy as np
+from tqdm import tqdm
 from math import sin, cos, pi
 
 def plot_rcm_layer(num_nodes: int, colors: list[str] = ["red", "blue"], circle_color = "red"):
@@ -63,6 +65,48 @@ def _base_plot(num_nodes: int, colors: list[str], circle_color: str):
     plt.ylim([-1.2, 1.2])
     plt.axis('off')
 
-# TODO add "plot_rcm_3d"
+def plot_from_weights(weights: np.ndarray, input_units: int, hidden_units: int):
+    """Creates a plot of the RCM layer given an array of weights"""
+    # Create list of angles for all nodes
+    assert weights.shape[0] == weights.shape[1]
+    angles = [(2 * pi * x) / weights.shape[0] for x in range(weights.shape[0])]
 
-# TODO add "plot_from_model"; plots from keras model trained instance (figure out a way to detect from this layer specifically, and color weights accordingly)
+    # Cap outliers
+    q_25, q_75 = np.percentile(weights, [25, 75])
+    iqr = q_75 - q_25
+    weights[weights > (1.5 * iqr + q_75)] = q_75
+    weights[weights < (-1.5 * iqr - q_25)] = q_25
+
+    # Normalize node weights
+    min_, max_ = np.min(weights), np.max(weights)
+    weights = np.array([[(col - min_) / (max_ - min_) for col in row] for row in weights])
+
+    # Generate points and create lines
+    OFFSET = angles[1] / 25
+    for (node, connection), val in tqdm(np.ndenumerate(weights), desc="Plotting Lines", total=weights.shape[0] ** 2):
+        # Augment the angles by a certain offset denoted in radians
+        theta_1 = angles[node] - OFFSET
+        theta_2 = angles[connection] + OFFSET
+        
+        # Get the two points's x and y coords
+        line_x = [cos(theta_1), cos(theta_2)]
+        line_y = [sin(theta_1), sin(theta_2)]
+        
+        # Plot the line
+        if node < input_units:
+            color = "blue"
+        elif node < hidden_units + input_units:
+            color = "green"
+        else:
+            color = "red"
+        plt.plot(line_x, line_y, color=color, alpha=val, linewidth=0.0025)
+
+    # Plot model
+    plt.gca().set_aspect(1)
+    plt.xlim([-1.2, 1.2])
+    plt.ylim([-1.2, 1.2])
+    plt.axis('off')
+    plt.savefig(f'models/model.svg', transparent=True, format="svg", bbox_inches="tight")
+    plt.cla()
+
+# TODO add "plot_rcm_3d"
