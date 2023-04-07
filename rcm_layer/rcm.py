@@ -27,7 +27,7 @@ class RCM(tf.keras.layers.Layer):
             hidden_units: int, 
             output_units: int, 
             num_propagations: int,
-            activations: ActivationTable | str | None = {"inputs": "relu", "hidden": "relu", "outputs": "softmax"},
+            activations: ActivationTable | str | None = "relu",
             weight_initializer: str = "glorot_uniform",
             normalization_position: str = None,
             dropout_rate: float = None,

@@ -78,7 +78,8 @@ def create_model(model_type: str) -> tf.keras.Model:
     elif model_type == "dense":
         nodes = equivalent_dense_nodes(
             dropout.get_shape()[-1], 
-            HIDDEN_UNITS, 
+            HIDDEN_UNITS,
+            RCM_OUTPUTS, 
             NUM_CLASSES
         )
         norm = BatchNormalization()(dropout)
@@ -94,7 +95,7 @@ def create_model(model_type: str) -> tf.keras.Model:
     return tf.keras.Model(inputs, outputs)
 
 # Runs both a Dense layer model and an RCM layer model to compare accuracies
-MODEL_TYPES = ["dense", "rcm"]
+MODEL_TYPES = ["dense"]
 for model_type in MODEL_TYPES:
     # Creates a model of the specified model type
     model = create_model(model_type)

@@ -1,0 +1,18 @@
+.wy-side-nav-search, .wy-nav-top {
+    background: rgb(50,50,50);
+    border-bottom-style: solid;
+    border-color: #ff0000;
+    border-width: 4px;
+}
+
+.wy-menu-vertical header, .wy-menu-vertical p.caption {
+    color: #FF0000;
+}
+
+.wy-side-nav-search input[type=text] {
+    border-color: rgb(255, 0, 0);
+}
+
+h1 {
+    color: rgb(131, 0, 0);
+}
