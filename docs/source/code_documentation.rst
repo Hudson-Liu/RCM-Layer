@@ -1,4 +1,4 @@
-The RCM Layer Package
+Code Documentation
 =====================
 
 .. raw:: html

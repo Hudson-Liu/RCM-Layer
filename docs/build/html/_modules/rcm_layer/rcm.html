@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rcm_layer.rcm &mdash; RCM Layer 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/Logo Vertical.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction_and_overview.html">Introduction &amp; Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../explanation_of_rcm_layers.html">Explanation of RCM Layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../code_documentation.html">Code Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">RCM Layer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rcm_layer.rcm</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rcm_layer.rcm</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;rcm.py: Contains a Keras layer implementation of the Recurrent Complete Multidigraph Layer&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Hudson Liu&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;hudsonliu0@gmail.com&quot;</span>
+
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypedDict</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+
+<div class="viewcode-block" id="ActivationTable"><a class="viewcode-back" href="../../code_documentation.html#rcm_layer.rcm.ActivationTable">[docs]</a><span class="k">class</span> <span class="nc">ActivationTable</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines the Activation Table dictionary used by the RCM layer&quot;&quot;&quot;</span>
+    <span class="n">inputs</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">hidden</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">outputs</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+<div class="viewcode-block" id="RCM"><a class="viewcode-back" href="../../code_documentation.html#rcm_layer.rcm.RCM">[docs]</a><span class="k">class</span> <span class="nc">RCM</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Layer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A Keras implementation of the Recurrent Complete Multidigraph Layer&quot;&quot;&quot;</span>
+    
+    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+            <span class="n">hidden_units</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+            <span class="n">output_units</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+            <span class="n">num_propagations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">activations</span><span class="p">:</span> <span class="n">ActivationTable</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">&quot;relu&quot;</span><span class="p">,</span>
+            <span class="n">weight_initializer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;glorot_uniform&quot;</span><span class="p">,</span>
+            <span class="n">normalization_position</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">dropout_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Jimmy&quot;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes params necessary for Jimmy MK IV&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="c1"># Initialize parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_units</span> <span class="o">=</span> <span class="n">hidden_units</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_units</span> <span class="o">=</span> <span class="n">output_units</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_propagations</span> <span class="o">=</span> <span class="n">num_propagations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight_initializer</span> <span class="o">=</span> <span class="n">weight_initializer</span> <span class="c1">#TODO try a new weight initiation scheme</span>
+
+        <span class="c1"># Initialize activation</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">activations</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activation_mode</span> <span class="o">=</span> <span class="s2">&quot;uniform&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activations</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">activations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">activations</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">activations</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activation_mode</span> <span class="o">=</span> <span class="s2">&quot;table&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activations</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">activations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">activations</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">activation_mode</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span>
+        
+        <span class="c1"># Initialize normalization position and verify validity</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">normalization_position</span> <span class="o">!=</span> <span class="s2">&quot;preactivation&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">normalization_position</span> <span class="o">!=</span> <span class="s2">&quot;postactivation&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">normalization_position</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The normalization_position value you entered was invalid.&quot;</span> <span class="o">+</span> 
+                <span class="sa">f</span><span class="s2">&quot;The value must either be &#39;preactivation&#39; or &#39;postactivation&#39;, received </span><span class="si">{</span><span class="n">normalization_position</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_norm</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">BatchNormalization</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalization_position</span> <span class="o">=</span> <span class="n">normalization_position</span>
+
+        <span class="c1"># Initialize dropout rate and verify validity</span>
+        <span class="k">if</span> <span class="n">dropout_rate</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dropout_rate</span> <span class="o">&gt;</span> <span class="mf">1.0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">dropout_rate</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The dropout rate cannot be greater than 1, received </span><span class="si">{</span><span class="n">dropout_rate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">dropout_rate</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">dropout_rate</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The dropout rate cannot be less than 0, received </span><span class="si">{</span><span class="n">dropout_rate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout_rate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout_rate</span> <span class="o">=</span> <span class="n">dropout_rate</span>
+
+<div class="viewcode-block" id="RCM.build"><a class="viewcode-back" href="../../code_documentation.html#rcm_layer.rcm.RCM.build">[docs]</a>    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates weights, biases, and untracked node states&quot;&quot;&quot;</span>
+        <span class="c1"># Generates input shape and total units and saves offset for usage in call</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_nodes</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#make this private</span>
+        <span class="n">total_units</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_units</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_units</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_units</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_units</span>
+        
+        <span class="c1"># Weights and biases</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_weight</span><span class="p">(</span>
+            <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">total_units</span><span class="p">,</span> <span class="n">total_units</span><span class="p">),</span>
+            <span class="n">initializer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weight_initializer</span><span class="p">,</span>
+            <span class="n">trainable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;weights&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_weight</span><span class="p">(</span>
+            <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">total_units</span><span class="p">,),</span>
+            <span class="n">initializer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weight_initializer</span><span class="p">,</span>
+            <span class="n">trainable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;biases&quot;</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="RCM.call"><a class="viewcode-back" href="../../code_documentation.html#rcm_layer.rcm.RCM.call">[docs]</a>    <span class="nd">@overrides</span>
+    <span class="nd">@tf</span><span class="o">.</span><span class="n">function</span>
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs a self-recurrent forward propagation.</span>
+<span class="sd">        Using the @tf.function decorator allows it to be</span>
+<span class="sd">        ran as a graph, greatly accelerating training speed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Set initial states</span>
+        <span class="n">states</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">paddings</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">]],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;CONSTANT&quot;</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
+        
+        <span class="c1"># Iteratively propagate data</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_propagations</span><span class="p">):</span>
+            <span class="c1"># Apply dropout</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout_rate</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">states</span><span class="p">)</span>
+
+            <span class="c1"># Calculate new states</span>
+            <span class="n">states</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">bias_add</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
+
+            <span class="c1"># Run preactivation normalization</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalization_position</span> <span class="o">==</span> <span class="s2">&quot;preactivation&quot;</span><span class="p">:</span>
+                <span class="n">states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_norm</span><span class="p">(</span><span class="n">states</span><span class="p">)</span>
+            
+            <span class="c1"># Apply activation functions</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_mode</span> <span class="o">==</span> <span class="s2">&quot;uniform&quot;</span><span class="p">:</span>
+                <span class="n">states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activations</span><span class="p">(</span><span class="n">states</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_mode</span> <span class="o">==</span> <span class="s2">&quot;table&quot;</span><span class="p">:</span>
+                <span class="n">states</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">activations</span><span class="p">[</span><span class="s2">&quot;inputs&quot;</span><span class="p">](</span><span class="n">states</span><span class="p">[:,</span> <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">input_nodes</span><span class="p">]),</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">activations</span><span class="p">[</span><span class="s2">&quot;hidden&quot;</span><span class="p">](</span><span class="n">states</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_nodes</span><span class="p">:</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">output_units</span><span class="p">]),</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">activations</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">](</span><span class="n">states</span><span class="p">[:,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">output_units</span><span class="p">:])</span>
+                    <span class="p">],</span>
+                    <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+                <span class="p">)</span>
+            
+            <span class="c1"># Run postactivation normalization</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalization_position</span> <span class="o">==</span> <span class="s2">&quot;postactivation&quot;</span><span class="p">:</span>
+                <span class="n">states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_norm</span><span class="p">(</span><span class="n">states</span><span class="p">)</span>
+
+        <span class="c1"># Returns output</span>
+        <span class="k">return</span> <span class="n">states</span><span class="p">[:,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">output_units</span><span class="p">:]</span></div>
+
+<div class="viewcode-block" id="RCM.get_config"><a class="viewcode-back" href="../../code_documentation.html#rcm_layer.rcm.RCM.get_config">[docs]</a>    <span class="nd">@overrides</span>
+    <span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Allows for serialization&quot;&quot;&quot;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;hidden_units&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_units</span><span class="p">,</span>
+                <span class="s2">&quot;output_units&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_units</span><span class="p">,</span>
+                <span class="s2">&quot;num_propagations&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_propagations</span><span class="p">,</span>
+                <span class="s2">&quot;activations&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">activations</span><span class="p">,</span>
+                <span class="s2">&quot;weight_initializer&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_initializer</span><span class="p">,</span>
+                <span class="s2">&quot;normalization_position&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalization_position</span><span class="p">,</span>
+                <span class="s2">&quot;dropout_rate&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout_rate</span><span class="p">,</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">config</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Hudson Liu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
