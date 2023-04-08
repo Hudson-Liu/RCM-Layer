@@ -1,6 +1,6 @@
 <h1 align="center">
   <picture>
-    <img alt="RCM Layer Logo" width="40%" height="40%" src="/docs/img/Logo%20Vertical.png">
+    <img alt="RCM Layer Logo" width="40%" height="40%" src="/docs/source/img/Logo%20Vertical.png">
   </picture>
   <br>
   An Alternative to the Conventional Dense Layer
