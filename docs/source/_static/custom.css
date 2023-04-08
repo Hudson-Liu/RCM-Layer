@@ -1,12 +1,16 @@
-.wy-side-nav-search, .wy-nav-top {
-    background: rgb(50,50,50);
-    border-bottom-style: solid;
-    border-color: #ff0000;
-    border-width: 4px;
+.wy-side-nav-search,
+.wy-nav-top {
+    background: rgb(50, 50, 50);
 }
 
-.wy-menu-vertical header, .wy-menu-vertical p.caption {
+.wy-menu-vertical header,
+.wy-menu-vertical p.caption {
     color: #FF0000;
+    font-size: 125%; /* converted from "large" */
+    text-align: center;
+    border-top: 0.1em solid #FF0000; /* converted from 2px */
+    border-bottom: 0.1em solid #FF0000; /* converted from 2px */
+    margin-bottom: 0.3em; /* converted from 6px */
 }
 
 .wy-side-nav-search input[type=text] {
