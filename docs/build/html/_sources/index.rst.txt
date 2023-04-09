@@ -13,7 +13,9 @@ Welcome to RCM Layer's documentation!
    introduction_and_overview
    explanation_of_rcm_layers
    getting_started
+   examples
    code_documentation
+   interactive_visualization
 
 Indices and tables
 ==================
