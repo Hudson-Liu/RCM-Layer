@@ -3,8 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to RCM Layer's documentation!
-=====================================
+
+RCM Layer 1.0.0-Alpha Documentation
+===================================
+
+.. raw:: html
+
+   <h2 align="center">
+      <picture>
+         <img alt="RCM Layer Logo" width="80%" height="80%" src="https://raw.githubusercontent.com/Hudson-Liu/rcm-layer/main/docs/source/img/Logo%20Horizontal.png">
+      </picture>
+      <br>
+      <img src="https://img.shields.io/badge/version-1.0.0--alpha-red?style=for-the-badge" alt="Version Number 1.0.0-Alpha">
+      <img src="https://img.shields.io/github/commit-activity/y/Hudson-Liu/rcm-layer?style=for-the-badge&color=red" alt="Commit Frequency">
+   </h2>
 
 .. toctree::
    :maxdepth: 2
