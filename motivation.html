@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Motivation &mdash; RCM Layer 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Comparative Performance Analysis" href="comparative_performance_analysis.html" />
+    <link rel="prev" title="Explanation of RCM Layers" href="explanation_of_rcm_layers.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/Logo Vertical.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction_and_overview.html">Introduction &amp; Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="explanation_of_rcm_layers.html">Explanation of RCM Layers</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Motivation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#alternative-architectures">Alternative Architectures</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="comparative_performance_analysis.html">Comparative Performance Analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code_documentation.html">Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interactive_visualization.html">Interactive Visualization of RCM Layer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RCM Layer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="explanation_of_rcm_layers.html">Explanation of RCM Layers</a></li>
+      <li class="breadcrumb-item active">Motivation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/motivation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="motivation">
+<h1>Motivation<a class="headerlink" href="#motivation" title="Permalink to this headline"></a></h1>
+<p>Ever since the inception of the Perceptron in the 1950’s, <strong>Densely-connected Feed-Forward layers</strong> have remained a staple of the machine learning industry.
+Dense layers are used in a wide variety of models, from ResNet34 all the way to the Transformer architecture.</p>
+<p>Despite its prevalence, Dense layers suffer from a few fundamental inefficiencies.
+One such issue is the computational expense of finding the optimal quantity of hidden layers and nodes.
+Even with the help of complex tuning algorithms, it is nearly impossible to ascertain the perfect amount of hidden layers and nodes for a given model.
+There are a few general rules that researchers broadly follow when constructing groups of Dense layers, but these rules only give rough estimates.
+This whole tuning issue stems from a more fundamental problem: <strong>the inefficiency of the layer structure</strong>.
+Neural networks are organized into layers due to their ability to model nonlinear curves and act as universal approximators; as the number of nodes increases, any model with at least 1 hidden layer can get arbitrarily close to any curve.
+Theoretically, any other neural network structure can be modeled by a 3-layer FFNN, as long as it is given an unlimited amount of nodes.
+However, universal approximation is not inherently limited to layer-like structures.
+We have found that, in many cases, alternative neural network structures are more efficient than traditional layered Dense networks.</p>
+<div class="section" id="alternative-architectures">
+<h2>Alternative Architectures<a class="headerlink" href="#alternative-architectures" title="Permalink to this headline"></a></h2>
+<p>An obvious alternative to layered networks is <strong>layerless networks</strong>.
+By creating a pool of nodes, then forming randomly distributed connections, a network unconstrained by any layer-like structure can be created (Fig 1).</p>
+<p>[Fig 1]</p>
+<p>If any of these layerless networks were able to outperform a layered network as a universal approximator, it would be proof that the layered structure is not the optimal architecture.</p>
+<p>In order to test this hypothesis, <strong>we compared the performance of both networks on a set of regression datasets</strong>.
+We first created 6 unique datasets, each representing a 2-dimensional curve (Fig 2).
+In order to test a wide range of data, we used an assortment of transcendental, polynomial, and piecewise functions.</p>
+<p>[Fig 2]</p>
+<p>The <em>x</em> and <em>y</em> axes were transformed into the feature vectors and output labels.
+Each dataset consisted of 100 data points, with each data point being taken at equidistantly spaced <em>x</em>-interval.
+The value of this <em>x</em>-interval was dependent on the chosen domain for that function, as shown in Fig 2.</p>
+<p>In terms of the neural network itself, a total of 12 nodes was allocated, with 1 input node, 1 output node, and 10 hidden nodes.
+ReLU activations were used throughout, as their popularity makes them serve as a good baseline.
+A unique layered model was created for each permutation of hidden layers (Fig 3).
+The number of connections “<em>c</em>” was tallied for each layered model.</p>
+<p>[Fig 3]</p>
+<p>A corresponding set of layerless networks was created for each layered model.
+This set consisted of every single possible combination of <em>c</em> connections among the 12 nodes, as can be seen in Fig 3.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="explanation_of_rcm_layers.html" class="btn btn-neutral float-left" title="Explanation of RCM Layers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="comparative_performance_analysis.html" class="btn btn-neutral float-right" title="Comparative Performance Analysis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Hudson Liu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
