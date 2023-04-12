@@ -46,7 +46,10 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction_and_overview.html">Introduction &amp; Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="explanation_of_rcm_layers.html">Explanation of RCM Layers</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#project-structure">Project Structure</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code_documentation.html">Code Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="interactive_visualization.html">Interactive Visualization of RCM Layer</a></li>
@@ -78,6 +81,24 @@
              
   <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline"></a></h1>
+<p>[Reference Fleat documentation &amp; write it similarly]</p>
+<div class="section" id="project-structure">
+<h2>Project Structure<a class="headerlink" href="#project-structure" title="Permalink to this headline"></a></h2>
+<p>This project is organized into 6 primary directories:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">docs</span></code>: All documentation for the webpage goes here.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">examples</span></code>: A few basic examples of using the RCM layer are located here</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rcm_layer`</span></code>: The primary RCM Layer library is contained here.
+This includes a Keras implementation of the RCM Layer concept, alongside a visualization toolkit,
+allowing for the easy creation of complex visualizations of the RCM layer.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">misc_scripts</span></code>: Programs that are referenced throughout the documentation documentation,
+but aren’t directly related to the RCM Layer itself, are put here. For instance,
+a proof of <em>layerless supremacy</em> would go here, as it’s not directly related to
+the RCM layer, but also serves an important role in the documentation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">models</span></code>: Models created as a result of the example programs are saved here.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tests</span></code>: Unit tests used to verify the functionality of the RCM Layer library are placed here.</p></li>
+</ol>
+</div>
 </div>
 
 
