@@ -1,6 +1,6 @@
-Interactive Visualization of RCM Layer
+Graph of Trained RCM Layer Weights
 ======================================
-This is an interactive visualization of a complex RCM layer after being trained.
+This is an interactive visualization of a complex RCM layer's weights after being trained.
 The model depicted in this visualization was taken from the CIFAR-100 example included in the RCM Layer Python library.
 
 .. raw:: html

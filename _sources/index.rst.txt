@@ -27,7 +27,7 @@ RCM Layer 1.0.0-Alpha Documentation
    getting_started
    examples
    code_documentation
-   interactive_visualization
+   visualizations
 
 Indices and tables
 ==================
