@@ -20,8 +20,8 @@ input_units = rcm_layer.input_shape[-1]
 hidden_units = rcm_layer.get_config()["hidden_units"]
 output_units = rcm_layer.output_shape[-1]
 
-# Create visualization
-plot_from_weights(weights, input_units, hidden_units)
+# Create visualization of model from weights (WARNING: THIS IS VERY SLOW!!!)
+# plot_from_weights(weights, input_units, hidden_units)
 
 # Plots an RCM Layer of 12 nodes
 plot_rcm_layer(12, colors=["limegreen", "darkgreen"], circle_color="green")
